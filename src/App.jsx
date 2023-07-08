@@ -1,24 +1,29 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import "./styles.css"
 import { NewTodoForm } from "./NewTodoForm"
 import { TodoList } from "./TodoList"
 
 export default function App() {
- 
+  
+  const[todos, setTodos] = useState(() => {
+    const localValue = localStorage.getItem("ITEMS")
+    if (localValue== null) return []
 
-  // this state is used for updating the list of todos and there for set to an empty array. 
-  const[todos, setTodos] = useState([])
+    return JSON.parse(localValue)
+  })
+
+  useEffect( ()=> {
+    localStorage.setItem("ITEMS", JSON.stringify(todos))
+  }, [todos])
 
   function addTodo(title) {
     setTodos(currentTodos => {
-      return
-      [
-          ...currentTodos,
-          {id: crypto.randomUUID(), title: newItem, completed: false},
+      return [
+        ...currentTodos,
+        {id: crypto.randomUUID(), title, completed: false},
       ]
       })
-  }
- 
+  } 
 
   function toggleTodo(id, completed){
     setTodos(currentTodos => {
@@ -42,7 +47,7 @@ export default function App() {
     <>
       <NewTodoForm onSubmit={addTodo} />
       <h1 className="Header">Todo List</h1>
-      <TodoList todos={todos} />
+      <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo} />
     </>
   )
 }
